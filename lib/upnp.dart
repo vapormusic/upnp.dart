@@ -3,6 +3,7 @@ library upnp;
 import "dart:async";
 import "dart:convert";
 import "dart:io";
+import 'dart:typed_data';
 
 import "package:xml/xml.dart";
 import 'package:collection/collection.dart' show IterableExtension;

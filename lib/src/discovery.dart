@@ -80,11 +80,39 @@ class DeviceDiscoverer {
     });
 
     try {
-      socket.joinMulticast(_v4_Multicast);
+      if (Platform.isIOS) {
+        final List<NetworkInterface> interfaces = await NetworkInterface.list(
+          includeLinkLocal: false,
+          type: InternetAddress.anyIPv4.type,
+          includeLoopback: false,
+        );
+        for (final interface in interfaces) {
+          final value = Uint8List.fromList(
+              _v4_Multicast.rawAddress + interface.addresses[0].rawAddress);
+          socket.setRawOption(
+              RawSocketOption(RawSocketOption.levelIPv4, 12, value));
+        }
+      } else {
+        socket.joinMulticast(_v4_Multicast);
+      }
     } on OSError {}
 
     try {
-      socket.joinMulticast(_v6_Multicast);
+      if (Platform.isIOS) {
+        final List<NetworkInterface> interfaces = await NetworkInterface.list(
+          includeLinkLocal: false,
+          type: InternetAddress.anyIPv6.type,
+          includeLoopback: false,
+        );
+        for (final interface in interfaces) {
+          final value = Uint8List.fromList(
+              _v6_Multicast.rawAddress + interface.addresses[0].rawAddress);
+          socket.setRawOption(
+              RawSocketOption(RawSocketOption.levelIPv6, 12, value));
+        }
+      } else {
+        socket.joinMulticast(_v6_Multicast);
+      }
     } on OSError {}
 
     for (var interface in _interfaces) {
